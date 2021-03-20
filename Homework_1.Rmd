@@ -5,14 +5,11 @@ output:
     df_print: paged
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
-
-```{r }
-install.packages("stringi")
-install.packages("LearnGeom")
-
+```{r message=FALSE, warning=FALSE}
+#install.packages("stringi")
+#install.packages("LearnGeom")
+#install.packages("kntir")
+library(knitr)
 library(stringi)
 library(LearnGeom)
 ```
@@ -44,35 +41,27 @@ for (i in 1:10000) {
   
   result_vec_Q1[i] <- counter
 }
-
 ```
 
 ```{r}
 mean(result_vec_Q1)
 ```
 
-
-```{r}
-mean(result_vec_Q1) + c(-1,1)*1.96*sd(result_vec_Q1)
-```
-
+The result of the simulation seems to be consistent with the theoretical result.
+We wanted to check if the result is close enough. On the one hand the theoretical result is within the confidence interval, but the confidence interval is very wide.
 
 ```{r}
 quantile(x = result_vec_Q1,probs = c(.025,.975))
-
 ```
 
-```{r}
-plot(sort(result_vec_Q1))
-```
+## c ##
+
+The number of keystrokes is blocked from below by 3 but not blocked from above.
+We can get a high number of keystrokes with a low probability (larger than the expected value and also twice the expected value). Therefore, it is observed that the number of keystrokes will come from an asymmetrical distribution with a right tail (as mentioned, the number of keystrokes is geometrically distributed and this distribution is asymmetrical). Therefore, we assume that the median will be lower than expected.
+
 
 ```{r}
-median(result_vec_Q1)
-```
-
-```{r}
-p <- 1/26^3
-real_median <- -1/log2(1-p)
+plot(density(result_vec_Q1), xlab = "Number of Keystrokes",main = "Emprical density of Keystrokes")
 ```
 
 # Question 2 #
@@ -88,22 +77,18 @@ for (i in 1:10000) {
 }
 ```
 
+The estimate value for obtuse angle:
 ```{r}
-mean(result_vec_Q2)
+p_Q2 <- mean(result_vec_Q2>90)
+p_Q2
 ```
+C.I of the probability to get obtuse angle (C.I for proportion):
 
 ```{r}
-plot(sort(result_vec_Q2))
+p_Q2 + (pnorm(.025)*sqrt(p_Q2*(1-p_Q2)/10000))*c(-1,1)
 ```
 
-```{r}
-summary(result_vec_Q2)
-```
-
-```{r}
-mean(result_vec_Q2>90)
-```
-
+The probability to get a right-angled triangle is zero:
 ```{r}
 mean(result_vec_Q2==90)
 ```
@@ -117,10 +102,13 @@ res_vec_Q3 <- numeric(10000)
 for (i in 1:10000) {
   res_vec_Q3[i] <- abs(median(rnorm(500)))
 }
-quantile(x = res_vec_Q3, probs = .95)
 ```
 
-the answer is 0.1098604 (if we change the answer, we should change also in part 3.B)
+pr(|Mu_statisti| >= Mu) 
+```{r}
+p_Q3 <- quantile(x = res_vec_Q3, probs = .95)
+p_Q3
+```
 
 ## b ##
 
@@ -129,16 +117,31 @@ res_vec_Q3B <- numeric(10000)
 for (i in 1:10000) {
   res_vec_Q3B[i] <- abs(median(rnorm(n = 500,mean = 0.1,sd = 1)))
 }
-mean(res_vec_Q3B>0.1098604)
 ```
+
+The estimate of the Power (the proportion of rejects):
+```{r}
+mean(res_vec_Q3B>p_Q3)
+```
+
+
+
+```{r}
+img1_path <- "~/Desktop/Ran/D year/semester b/hishov statisti/exercies/HW1/Q3.png"
+include_graphics(img1_path)
+```
+
 
 # Question 4 #
 
-board game:
+## a ##
+
+Board Game:
 1 2 3
 4 5 6
 7 8 9
 
+Auxiliary function - simulate the option of a cat to move in the next step on the board game.
 
 ```{r}
 cat_move <- function(num_1)
@@ -173,10 +176,14 @@ cat_move <- function(num_1)
 }
 ```
 
+Initialization:
+
 ```{r}
 cat_1 <- 1
 cat_2 <- 9
 ```
+
+Lets the Game Begin!
 
 ```{r}
 round_number <- vector(length = 1050)
@@ -188,17 +195,73 @@ for (i in 1:1050) {
 }
 ```
 
+The probability that both cats are in the same cell: 
+
 ```{r}
 mean(round_number[51:1050])
 ```
+gamble_sim <- function(target_value,start_value,win_prob,gamble_value) {
+  while(start_value > 0 && start_value<target_value){
+    
+  }
+  
+}
+# Question 5 #
+
+## a1 ##
+```{r}
+gamble <- function(target_value,start_value,win_prob,gamble_value){
+  while((start_value > 0) && (start_value<target_value)){
+    himur <- min(target_value-start_value,start_value,gamble_value)
+    x <- rbinom(n=1,size = 1,prob = win_prob)
+    ifelse(x==1,start_value <- start_value+himur,start_value <- start_value-himur)
+  }
+  start_value==target_value
+}
+
+gamble_value <- c(.1,.5,1,2)
+win_win <- numeric(4)
+for(i in 1:4){
+  win_win[i] <- mean(replicate(10000,gamble(5,2,0.6,gamble_value[i])))
+}
+win_win
+data.frame(gamble_value,win_win)
+
+```
+The optimal strategy is to start with the fixed bet amount 0.1.
+
+## a2 ##
+
+```{r}
+gamble_value <- c(.1,.5,1,2)
+win_win <- numeric(4)
+for(i in 1:4){
+  win_win[i] <- mean(replicate(10000,gamble(10,4,0.4,gamble_value[i])))
+}
+win_win
+data.frame(gamble_value,win_win)
+```
+The optimal strategy is to start with the fixed bet amount 2
+
+## a3 ##
+
+```{r}
+new_gamble <- function(target_value,start_value,win_prob,gamble_value){
+  while((start_value > 0) && (start_value<target_value)){
+    x <- rbinom(n=1,size = 1,prob = win_prob)
+    ifelse(x==1,start_value <- start_value+gamble_value,(start_value <- start_value-gamble_value) && (gamble_value <- 2*gamble_value))
+  }
+  start_value>=target_value
+}
+
+gamble_value <- c(.1,.5,1,2)
+win_win_0.6 <- numeric(4)
+for(i in 1:4){
+  win_win[i] <- mean(replicate(10000,new_gamble(10,4,0.4,gamble_value[i])))
+}
+win_win_0.6
+data.frame(gamble_value,win_win_0.6)
 
 
-
-
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```
 
