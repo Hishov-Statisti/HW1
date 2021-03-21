@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Exercies 1 - Alon Goodman & Ran Hassid"
 output:
   html_document:
     df_print: paged
@@ -125,11 +125,9 @@ The estimate of the Power (the proportion of rejects):
 mean(res_vec_Q3B>p_Q3)
 ```
 
+The part of the analytical calculation of the power for a test based on the mean is in the attached pdf file.
 
-```{r}
-#img1_path <- "~/Desktop/Ran/D year/semester b/hishov statisti/exercies/HW1/Q3.png"
-#include_graphics(img1_path)
-```
+It can be seen that its power is higher than that of the median-based test so we will prefer it.
 
 
 # Question 4 #
