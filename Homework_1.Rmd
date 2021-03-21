@@ -3,6 +3,7 @@ title: "R Notebook"
 output:
   html_document:
     df_print: paged
+  pdf_document: default
 ---
 
 ```{r message=FALSE, warning=FALSE}
@@ -125,10 +126,9 @@ mean(res_vec_Q3B>p_Q3)
 ```
 
 
-
 ```{r}
-img1_path <- "~/Desktop/Ran/D year/semester b/hishov statisti/exercies/HW1/Q3.png"
-include_graphics(img1_path)
+#img1_path <- "~/Desktop/Ran/D year/semester b/hishov statisti/exercies/HW1/Q3.png"
+#include_graphics(img1_path)
 ```
 
 
@@ -137,8 +137,11 @@ include_graphics(img1_path)
 ## a ##
 
 Board Game:
+
 1 2 3
+
 4 5 6
+
 7 8 9
 
 Auxiliary function - simulate the option of a cat to move in the next step on the board game.
@@ -200,12 +203,7 @@ The probability that both cats are in the same cell:
 ```{r}
 mean(round_number[51:1050])
 ```
-gamble_sim <- function(target_value,start_value,win_prob,gamble_value) {
-  while(start_value > 0 && start_value<target_value){
-    
-  }
-  
-}
+
 # Question 5 #
 
 ## a1 ##
@@ -220,12 +218,12 @@ gamble <- function(target_value,start_value,win_prob,gamble_value){
 }
 
 gamble_value <- c(.1,.5,1,2)
-win_win <- numeric(4)
+win_win_0.6 <- numeric(4)
 for(i in 1:4){
-  win_win[i] <- mean(replicate(10000,gamble(5,2,0.6,gamble_value[i])))
+  win_win_0.6[i] <- mean(replicate(10000,gamble(5,2,0.6,gamble_value[i])))
 }
-win_win
-data.frame(gamble_value,win_win)
+win_win_0.6
+data.frame(gamble_value,win_win_0.6)
 
 ```
 The optimal strategy is to start with the fixed bet amount 0.1.
@@ -234,34 +232,109 @@ The optimal strategy is to start with the fixed bet amount 0.1.
 
 ```{r}
 gamble_value <- c(.1,.5,1,2)
-win_win <- numeric(4)
+win_win_0.4 <- numeric(4)
 for(i in 1:4){
-  win_win[i] <- mean(replicate(10000,gamble(10,4,0.4,gamble_value[i])))
+  win_win_0.4[i] <- mean(replicate(10000,gamble(10,4,0.4,gamble_value[i])))
 }
-win_win
-data.frame(gamble_value,win_win)
+win_win_0.4
+data.frame(gamble_value,win_win_0.4)
 ```
 The optimal strategy is to start with the fixed bet amount 2
 
-## a3 ##
+## b ##
 
+The new strategy is if we lose then we double the bet
 ```{r}
 new_gamble <- function(target_value,start_value,win_prob,gamble_value){
-  while((start_value > 0) && (start_value<target_value)){
-    x <- rbinom(n=1,size = 1,prob = win_prob)
-    ifelse(x==1,start_value <- start_value+gamble_value,(start_value <- start_value-gamble_value) && (gamble_value <- 2*gamble_value))
-  }
-  start_value>=target_value
+  himur <- min(target_value-start_value,start_value,gamble_value)
+  while((start_value > 0) && (start_value<target_value))
+    {
+      x <- rbinom(n=1,size = 1,prob = win_prob)
+      if(x==1){
+        start_value <- start_value+himur
+        himur <- min(target_value-start_value,start_value,gamble_value)
+      }
+      if(x==0){
+          start_value <- start_value-himur
+          himur <-min(target_value-start_value,start_value,gamble_value*2)
+      }
+    }
+  start_value==target_value
 }
-
-gamble_value <- c(.1,.5,1,2)
-win_win_0.6 <- numeric(4)
-for(i in 1:4){
-  win_win[i] <- mean(replicate(10000,new_gamble(10,4,0.4,gamble_value[i])))
-}
-win_win_0.6
-data.frame(gamble_value,win_win_0.6)
-
 
 ```
+
+```{r}
+gamble_value <- c(.1,.5,1,2)
+win_win_0.6_new <- numeric(4)
+for(i in 1:4){
+  win_win_0.6_new[i] <- mean(replicate(10000,new_gamble(5,2,0.6,gamble_value[i])))
+}
+win_win_0.6_new
+data.frame(gamble_value,win_win_0.6,win_win_0.6_new)
+
+```
+
+```{r}
+gamble_value <- c(.1,.5,1,2)
+win_win_0.4_new <- numeric(4)
+for(i in 1:4){
+  win_win_0.4_new[i] <- mean(replicate(10000,new_gamble(10,4,0.4,gamble_value[i])))
+}
+win_win_0.4_new
+data.frame(gamble_value,win_win_0.4,win_win_0.4_new)
+```
+
+## c ##
+
+
+```{r}
+gamble_val <- c(.1,.5,1,2)
+p <- c(.1,.25,.5,.75,.9)
+
+mat_a5_sv1 <- matrix(1:20, nrow = 4, ncol = 5,dimnames = list(gamble_val,p))
+for(i in 1:4){
+  for(j in 1:5){
+    mat_a5_sv1[i,j] <- mean(replicate(10000,gamble(5,1,p[j],gamble_val[i])))
+  }}
+mat_a5_sv1
+```
+
+
+```{r}
+mat_a6_sv2 <- matrix(1:20, nrow = 4, ncol = 5,dimnames = list(gamble_val,p))
+for(i in 1:4){
+  for(j in 1:5){
+    mat_a6_sv2[i,j] <- mean(replicate(10000,gamble(6,2,p[j],gamble_val[i])))
+  }}
+mat_a6_sv2
+```
+
+
+```{r}
+mat_a8_sv3 <- matrix(1:20, nrow = 4, ncol = 5,dimnames = list(gamble_val,p))
+for(i in 1:4){
+  for(j in 1:5){
+    mat_a8_sv3[i,j] <- mean(replicate(10000,gamble(8,3,p[j],gamble_val[i])))
+  }}
+mat_a8_sv3
+```
+
+
+```{r}
+mat_a10_sv4 <- matrix(1:20, nrow = 4, ncol = 5,dimnames = list(gamble_val,p))
+for(i in 1:4){
+  for(j in 1:5){
+    mat_a10_sv4[i,j] <- mean(replicate(10000,gamble(10,4,p[j],gamble_val[i])))
+  }}
+mat_a10_sv4
+```
+
+The optimal strategy for p<0.5 is to start with the biggest bet amount.
+The optimal strategy for p>0.5 is to start with the lowest bet amount.
+For p=0.5 there is no clear strategy.
+An intuitive explanation for this is that when the probability of winning increases there is no reason to invest a large amount in a bet to reach the final goal. 
+But if the probability of winning are low you should invest a large bet amount to try and reach the final goal.
+
+
 
