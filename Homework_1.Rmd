@@ -1,5 +1,5 @@
 ---
-title: "Exercies 1 - Alon Goodman & Ran Hassid"
+title: "Exercies 1 - Alon Godman & Ran Hassid"
 output:
   html_document:
     df_print: paged
